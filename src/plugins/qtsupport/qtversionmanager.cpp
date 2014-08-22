@@ -73,7 +73,7 @@ static const char QTVERSION_LEGACY_FILENAME[] = "/qtversion.xml"; // TODO: pre 2
 // legacy settings
 static const char QtVersionsSectionName[] = "QtVersions";
 
-enum { debug = 0 };
+enum { debug = 1 };
 
 template<class T>
 static T *createToolChain(const QString &id)

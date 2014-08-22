@@ -1560,6 +1560,7 @@ void Qt4ProFileNode::update()
     setParseInProgressRecursive(true);
     setupReader();
     EvalResult evalResult = evaluate();
+    qDebug() << __PRETTY_FUNCTION__ << " evalresult: " << evalResult;
     applyEvaluate(evalResult, false);
 }
 
@@ -1588,6 +1589,7 @@ Qt4ProFileNode::EvalResult Qt4ProFileNode::evaluate()
     } else {
         evalResult = EvalFail;
     }
+    qDebug() << __PRETTY_FUNCTION__ << " evalresult: " << evalResult;
     return evalResult;
 }
 

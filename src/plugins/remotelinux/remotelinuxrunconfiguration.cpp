@@ -60,6 +60,7 @@ public:
         : projectFilePath(projectFilePath),
           useAlternateRemoteExecutable(false)
     {
+        qDebug() << __PRETTY_FUNCTION__;
     }
 
     RemoteLinuxRunConfigurationPrivate(const RemoteLinuxRunConfigurationPrivate *other)
@@ -70,6 +71,7 @@ public:
           alternateRemoteExecutable(other->alternateRemoteExecutable),
           workingDirectory(other->workingDirectory)
     {
+        qDebug() << __PRETTY_FUNCTION__;
     }
 
     QString projectFilePath;
@@ -90,6 +92,7 @@ RemoteLinuxRunConfiguration::RemoteLinuxRunConfiguration(Target *parent, const C
     : RunConfiguration(parent, id),
       d(new RemoteLinuxRunConfigurationPrivate(proFilePath))
 {
+        qDebug() << __PRETTY_FUNCTION__;
     init();
 }
 
@@ -98,6 +101,7 @@ RemoteLinuxRunConfiguration::RemoteLinuxRunConfiguration(ProjectExplorer::Target
     : RunConfiguration(parent, source),
       d(new RemoteLinuxRunConfigurationPrivate(source->d))
 {
+        qDebug() << __PRETTY_FUNCTION__;
     init();
 }
 
@@ -120,11 +124,14 @@ void RemoteLinuxRunConfiguration::init()
 
 bool RemoteLinuxRunConfiguration::isEnabled() const
 {
+    qDebug() << __PRETTY_FUNCTION__;
     if (remoteExecutableFilePath().isEmpty()) {
         d->disabledReason = tr("Don't know what to run.");
+        qDebug() << __FUNCTION__ << " returning false";
         return false;
     }
     d->disabledReason.clear();
+    qDebug() << __FUNCTION__ << " returning true";
     return true;
 }
 
@@ -211,12 +218,19 @@ QString RemoteLinuxRunConfiguration::commandPrefix() const
 
 QString RemoteLinuxRunConfiguration::localExecutableFilePath() const
 {
+    qDebug() << "RemoteLinuxRunConfiguration: localexe: " << target()->applicationTargets().targetForProject(Utils::FileName::fromString(d->projectFilePath)).toString();
+
+    qDebug() << "RemoteLinuxRunConfiguration: projectfilePath: " << d->projectFilePath;
+
     return target()->applicationTargets()
             .targetForProject(Utils::FileName::fromString(d->projectFilePath)).toString();
 }
 
 QString RemoteLinuxRunConfiguration::defaultRemoteExecutableFilePath() const
 {
+
+    
+
     return target()->deploymentData().deployableForLocalFile(localExecutableFilePath())
             .remoteFilePath();
 }

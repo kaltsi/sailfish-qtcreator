@@ -537,6 +537,7 @@ void Qt4Project::updateCppCodeModel()
 
     FindQt4ProFiles findQt4ProFiles;
     QList<Qt4ProFileNode *> proFiles = findQt4ProFiles(rootProjectNode());
+    qDebug() << "profiles size: " << proFiles.size();
 
     CppTools::CppModelManagerInterface::ProjectInfo pinfo = modelmanager->projectInfo(this);
     pinfo.clearProjectParts();
@@ -548,14 +549,19 @@ void Qt4Project::updateCppCodeModel()
             qtVersionForPart = ProjectPart::Qt5;
     }
 
+    qDebug() << __PRETTY_FUNCTION__ << " qtversion: " << qtVersion->qtVersionString() << " qtVersionForPart: " << qtVersionForPart;
+
     QStringList allFiles;
     foreach (Qt4ProFileNode *pro, proFiles) {
+        qDebug() << "in-foreach";
         ProjectPart::Ptr part(new ProjectPart);
 
         if (pro->variableValue(ConfigVar).contains(QLatin1String("qt")))
             part->qtVersion = qtVersionForPart;
         else
             part->qtVersion = ProjectPart::NoQt;
+
+        qDebug() << "variablevalue: " << pro->variableValue(ConfigVar);
 
         const QStringList cxxflags = pro->variableValue(CppFlagsVar);
         part->evaluateToolchain(ToolChainKitInformation::toolChain(k),
@@ -615,6 +621,10 @@ void Qt4Project::updateCppCodeModel()
     }
 
     setProjectLanguage(ProjectExplorer::Constants::LANG_CXX, !allFiles.isEmpty());
+
+    foreach (const QString &l, allFiles) {
+        qDebug() << "file: " << l;
+    }
 
     m_codeModelFuture = modelmanager->updateProjectInfo(pinfo);
 }
@@ -1491,6 +1501,7 @@ Target *Qt4Project::createTarget(Kit *k, const QList<BuildConfigurationInfo> &in
 
 void Qt4Project::updateBuildSystemData()
 {
+    qDebug() << __PRETTY_FUNCTION__;
     Target * const target = activeTarget();
     if (!target)
         return;
@@ -1498,8 +1509,17 @@ void Qt4Project::updateBuildSystemData()
     if (!rootNode || rootNode->parseInProgress())
         return;
 
+    qDebug() << __FUNCTION__ << " after";
+
     DeploymentData deploymentData;
     collectData(rootNode, deploymentData);
+
+    qDebug() << "deployable files: " << deploymentData.fileCount();
+
+    foreach (const DeployableFile &d, deploymentData.allFiles()) {
+        qDebug() << "file: " << d.localFilePath().toString();
+    }
+
     target->setDeploymentData(deploymentData);
 
     BuildTargetInfoList appTargetList;
@@ -1510,10 +1530,15 @@ void Qt4Project::updateBuildSystemData()
 
 void Qt4Project::collectData(const Qt4ProFileNode *node, DeploymentData &deploymentData)
 {
-    if (!node->isSubProjectDeployable(node->path()))
+    qDebug() << __PRETTY_FUNCTION__;
+    if (!node->isSubProjectDeployable(node->path())) {
+        qDebug() << "not deployable: " << node->path();
         return;
+    }
 
     const InstallsList &installsList = node->installsList();
+    qDebug() << "installist size: " << installsList.items.size();
+
     foreach (const InstallsItem &item, installsList.items) {
         foreach (const QString &localFile, item.files)
             deploymentData.addFile(localFile, item.path);

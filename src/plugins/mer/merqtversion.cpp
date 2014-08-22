@@ -215,6 +215,7 @@ QList<ProjectExplorer::Task> MerQtVersion::reportIssuesImpl(const QString &proFi
 
     }
     results.append(BaseQtVersion::reportIssuesImpl(proFile, buildDir));
+    qDebug() << __PRETTY_FUNCTION__ << " results size: " << results.size();
     return results;
 }
 

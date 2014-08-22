@@ -39,6 +39,7 @@ MerRunConfiguration::MerRunConfiguration(ProjectExplorer::Target *parent, const 
                                          const QString &proFilePath)
     : RemoteLinux::RemoteLinuxRunConfiguration(parent, id, proFilePath)
 {
+    qDebug() << __PRETTY_FUNCTION__;
     ctor();
 }
 
@@ -46,6 +47,7 @@ MerRunConfiguration::MerRunConfiguration(ProjectExplorer::Target *parent,
                                          MerRunConfiguration *source)
     : RemoteLinux::RemoteLinuxRunConfiguration(parent, source)
 {
+    qDebug() << __PRETTY_FUNCTION__;
     ctor();
 }
 
@@ -64,6 +66,7 @@ QString MerRunConfiguration::disabledReason() const
 
 bool MerRunConfiguration::isEnabled() const
 {   
+    qDebug() << __PRETTY_FUNCTION__;
     //TODO Hack
 
     ProjectExplorer::DeployConfiguration* conf = target()->activeDeployConfiguration();
@@ -72,15 +75,18 @@ bool MerRunConfiguration::isEnabled() const
         if(ProjectExplorer::DeviceTypeKitInformation::deviceTypeId(target()->kit()) == Constants::MER_DEVICE_TYPE_ARM
             && conf->id() == MerMb2RpmBuildConfiguration::configurationId()) {
             m_disabledReason = tr("This deployment method does not support run configuration");
+            qDebug() << __FUNCTION__ << " return false";
             return false;
         }
     }
 
+    qDebug() << __FUNCTION__ << " returning RemoteLinuxRunConfiguration::isEnabled";
     return RemoteLinuxRunConfiguration::isEnabled();
 }
 
 QString MerRunConfiguration::defaultRemoteExecutableFilePath() const
 {
+    qDebug() << __PRETTY_FUNCTION__;
     ProjectExplorer::DeployConfiguration* conf = target()->activeDeployConfiguration();
     if (!conf) return QString();
 
@@ -100,6 +106,7 @@ QString MerRunConfiguration::defaultRemoteExecutableFilePath() const
 
 QString MerRunConfiguration::commandPrefix() const
 {
+    qDebug() << __PRETTY_FUNCTION__;
   RemoteLinux::RemoteLinuxEnvironmentAspect *aspect =
     extraAspect<RemoteLinux::RemoteLinuxEnvironmentAspect>();
   QTC_ASSERT(aspect, return QString());

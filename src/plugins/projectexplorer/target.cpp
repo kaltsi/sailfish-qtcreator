@@ -382,6 +382,13 @@ DeploymentData Target::deploymentData() const
 
 void Target::setApplicationTargets(const BuildTargetInfoList &appTargets)
 {
+    qDebug() << __PRETTY_FUNCTION__;
+
+    qDebug() << "set targetinfolist:";
+    foreach (const BuildTargetInfo &i, appTargets.list) {
+        qDebug() << "foo: " << i.targetFilePath.toString();
+    }
+
     if (d->m_appTargets != appTargets) {
         d->m_appTargets = appTargets;
         emit applicationTargetsChanged();
@@ -390,6 +397,13 @@ void Target::setApplicationTargets(const BuildTargetInfoList &appTargets)
 
 BuildTargetInfoList Target::applicationTargets() const
 {
+
+    BuildTargetInfoList l = d->m_appTargets;
+    qDebug() << "output targetinfolist:";
+    foreach (const BuildTargetInfo &i, l.list) {
+        qDebug() << "foo: " << i.targetFilePath.toString();
+    }
+
     return d->m_appTargets;
 }
 

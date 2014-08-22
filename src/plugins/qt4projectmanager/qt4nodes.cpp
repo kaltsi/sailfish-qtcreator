@@ -164,7 +164,7 @@ static void clearQt4NodeStaticData()
     qt4NodeStaticData()->projectIcon = QIcon();
 }
 
-enum { debug = 0 };
+enum { debug = 1 };
 
 using namespace Qt4ProjectManager;
 using namespace Qt4ProjectManager::Internal;
@@ -1565,6 +1565,7 @@ void Qt4ProFileNode::update()
 
 void Qt4ProFileNode::setupReader()
 {
+    qDebug() << __FUNCTION__;
     Q_ASSERT(!m_readerExact);
     Q_ASSERT(!m_readerCumulative);
 
@@ -1576,6 +1577,7 @@ void Qt4ProFileNode::setupReader()
 
 Qt4ProFileNode::EvalResult Qt4ProFileNode::evaluate()
 {
+    qDebug() << __FUNCTION__;
     EvalResult evalResult = EvalOk;
     if (ProFile *pro = m_readerExact->parsedProFile(m_projectFilePath)) {
         if (!m_readerExact->accept(pro, QMakeEvaluator::LoadAll))
@@ -1591,12 +1593,14 @@ Qt4ProFileNode::EvalResult Qt4ProFileNode::evaluate()
 
 void Qt4ProFileNode::asyncEvaluate(QFutureInterface<EvalResult> &fi)
 {
+    qDebug() << __FUNCTION__;
     EvalResult evalResult = evaluate();
     fi.reportResult(evalResult);
 }
 
 void Qt4ProFileNode::applyAsyncEvaluate()
 {
+    qDebug() << __FUNCTION__;
     applyEvaluate(m_parseFutureWatcher.result(), true);
     m_project->decrementPendingEvaluateFutures();
 }
@@ -1608,6 +1612,7 @@ bool sortByNodes(Node *a, Node *b)
 
 void Qt4ProFileNode::applyEvaluate(EvalResult evalResult, bool async)
 {
+    qDebug() << __FUNCTION__;
     if (!m_readerExact)
         return;
     if (evalResult == EvalFail || m_project->wasEvaluateCanceled()) {
@@ -1620,8 +1625,10 @@ void Qt4ProFileNode::applyEvaluate(EvalResult evalResult, bool async)
 
         if (evalResult == EvalFail) {
             m_project->proFileParseError(tr("Error while parsing file %1. Giving up.").arg(m_projectFilePath));
-            if (m_projectType == InvalidProject)
+            if (m_projectType == InvalidProject) {
+                qDebug() << __FUNCTION__ << "invalidproject";
                 return;
+            }
 
             // delete files && folders && projects
             removeFileNodes(fileNodes(), this);
@@ -1636,6 +1643,9 @@ void Qt4ProFileNode::applyEvaluate(EvalResult evalResult, bool async)
                 if (Internal::Qt4NodesWatcher *qt4Watcher = qobject_cast<Internal::Qt4NodesWatcher*>(watcher))
                     emit qt4Watcher->projectTypeChanged(this, oldType, InvalidProject);
         }
+
+        qDebug() << __FUNCTION__ << "evailfail or canceled";
+
         return;
     }
 
@@ -1858,6 +1868,7 @@ void Qt4ProFileNode::applyEvaluate(EvalResult evalResult, bool async)
 
     m_validParse = (evalResult == EvalOk);
     if (m_validParse) {
+        qDebug() << __FUNCTION__ << " validparse!";
 
         // update TargetInformation
         m_qt4targetInformation = targetInformation(m_readerExact);
@@ -1930,7 +1941,10 @@ void Qt4ProFileNode::applyEvaluate(EvalResult evalResult, bool async)
                     emit qt4Watcher->variablesChanged(this, oldValues, m_varValues);
         }
     } // evalResult == EvalOk
+    else {
+        qDebug() << __FUNCTION__ << " NOT validparse!";
 
+    }
     setParseInProgress(false);
 
     createUiCodeModelSupport();

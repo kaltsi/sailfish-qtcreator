@@ -68,7 +68,7 @@ using namespace Qt4ProjectManager;
 using namespace Qt4ProjectManager::Internal;
 using namespace ProjectExplorer;
 
-enum { debug = 0 };
+enum { debug = 1 };
 
 // -----------------------------------------------------------------------
 // Helpers:
@@ -78,12 +78,19 @@ namespace {
 
 Qt4BuildConfiguration *enableActiveQt4BuildConfiguration(ProjectExplorer::Target *t, bool enabled)
 {
-    if (!t)
+    if (!t) {
+        qDebug() << __FUNCTION__ << " !t";
         return 0;
+    }
     Qt4BuildConfiguration *bc = static_cast<Qt4BuildConfiguration *>(t->activeBuildConfiguration());
-    if (!bc)
+    if (!bc)  {
+        qDebug() << __FUNCTION__ << " !bc";
+
         return 0;
+    }
     bc->setEnabled(enabled);
+    qDebug() << __FUNCTION__ << " bc enabled";
+
     return bc;
 }
 
